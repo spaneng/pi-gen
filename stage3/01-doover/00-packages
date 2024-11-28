@@ -3,3 +3,7 @@ docker-ce-cli
 containerd.io
 docker-buildx-plugin
 docker-compose-plugin
+cockpit
+doovit-cli
+doover-site-install
+ufw
