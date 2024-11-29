@@ -1,0 +1,14 @@
+# we will rename this in the post-install scripts, but leave it at this for now.
+TARGET_HOSTNAME=doovit
+TIMEZONE_DEFAULT=Australia/Brisbane
+
+FIRST_USER_NAME=doovit
+FIRST_USER_PASS=doovit
+DISABLE_FIRST_BOOT_USER_RENAME=1
+
+WPA_COUNTRY=AU
+ENABLE_SSH=1
+
+WLAN_SSID=doover_magnet
+WLAN_PASS=doover_magnet
+
