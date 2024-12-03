@@ -26,11 +26,12 @@ iface eth0 inet manual
 iface eth1 inet manual
 
 # Bridge setup
-auto br0
-iface br0 inet dhcp
-  bridge_ports eth0 eth1
-EOT
-
+iface br0 inet manual
+    up ifconfig $IFACE
+    down ifconfig $IFACE
+    pre-up brctl add $IFACE
+    pre-up brctl addif $IFACE eth0 eth1
+    post-down brctl delbr $IFACE
 
 # GPIO
 # 14,15 = UART0
@@ -42,7 +43,7 @@ EOT
 # 20    = RP_BOOT
 # 21    = RP_RESET
 
-cat >> "${ROOTFS_DIR}"/boot/config.txt << EOF
+cat >> "${ROOTFS_DIR}"/boot/firmware/config.txt << EOF
 dtoverlay=uart0,txd1_pin=14,rxd1_pin=15
 dtoverlay=uart1,txd1_pin=4,rxd1_pin=5
 gpio=9=op,dl
@@ -59,5 +60,6 @@ on_chroot <<- EOF
   ufw allow 22
   ufw allow 80
   ufw allow 443
+  uft allow 9090
   ufw --force enable
 EOF
