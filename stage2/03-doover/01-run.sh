@@ -2,7 +2,47 @@
 
 # set default wifi username and password set in the config file.
 
-echo "test 4"
+if [ -v WLAN_SSID ]; then
+
+  wifi_security=""
+
+  if [ -v WLAN_PASS ]; then
+    wifi_security="
+[wifi-security]
+auth-alg=open
+key-mgmt=wpa-psk
+psk=$WLAN_PASS"
+
+  fi
+
+  cat >> "${ROOTFS_DIR}/etc/NetworkManager/system-connections/$WLAN_SSID.nmconnection" <<- EOF
+[connection]
+id=$WLAN_SSID
+type=wifi
+interface-name=wlan0
+
+[wifi]
+mode=infrastructure
+ssid=$WLAN_SSID
+
+$wifi_security
+
+[ipv4]
+method=auto
+
+[ipv6]
+addr-gen-mode=default
+method=auto
+
+[proxy]
+EOF
+
+  on_chroot <<- EOF
+chown root:root /etc/NetworkManager/system-connections/$WLAN_SSID.nmconnection
+chmod 600 /etc/NetworkManager/system-connections/$WLAN_SSID.nmconnection
+EOF
+
+fi
 
 # Create NetworkManager configuration files
 install -v -m 600 files/br0.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/br0.nmconnection"
@@ -10,7 +50,7 @@ install -v -m 600 files/eth0.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/syst
 install -v -m 600 files/eth1.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/eth1.nmconnection"
 
 # Ensure the correct owner for the files
-on_chroot << EOF
+on_chroot <<- EOF
 chown root:root /etc/NetworkManager/system-connections/br0.nmconnection
 chown root:root /etc/NetworkManager/system-connections/eth0.nmconnection
 chown root:root /etc/NetworkManager/system-connections/eth1.nmconnection
