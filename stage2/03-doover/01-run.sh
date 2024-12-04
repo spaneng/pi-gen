@@ -5,7 +5,7 @@
 if [ -v WLAN_SSID ]; then
 	on_chroot <<- EOF
 		SUDO_USER="${FIRST_USER_NAME}" nmcli c add type wifi con-name "${WLAN_SSID}" ifname wlan0 ssid "${WLAN_SSID}"
-	EOF
+	EO
 fi
 
 if [ -v WLAN_SSID ] && [ -v WLAN_PASS ]; then
@@ -16,22 +16,11 @@ fi
 
 
 # set ethernet ports as bridged to allow switching behaviour
-cat <<EOT >> "${ROOTFS_DIR}"/etc/network/interfaces
-# The loopback network interface
-auto lo
-iface lo inet loopback
-
-# Set up interfaces manually, avoiding conflicts with, e.g., network manager
-iface eth0 inet manual
-iface eth1 inet manual
-
-# Bridge setup
-iface br0 inet manual
-    up ifconfig $IFACE
-    down ifconfig $IFACE
-    pre-up brctl add $IFACE
-    pre-up brctl addif $IFACE eth0 eth1
-    post-down brctl delbr $IFACE
+on_chroot <<- EOF
+  	SUDO_USER="${FIRST_USER_NAME}" nmcli c add type bridge ifname "br0" con-name "br0"
+	SUDO_USER="${FIRST_USER_NAME}" nmcli c add type ethernet ifname "eth0" con-name "eth0" master "br0" slave-type bridge
+	SUDO_USER="${FIRST_USER_NAME}" nmcli c add type ethernet ifname "eth1" con-name "eth1" master "br0" slave-type bridge
+EOF
 
 # GPIO
 # 14,15 = UART0
