@@ -2,24 +2,21 @@
 
 # set default wifi username and password set in the config file.
 
-if [ -v WLAN_SSID ]; then
-	on_chroot <<- EOF
-		SUDO_USER="${FIRST_USER_NAME}" nmcli c add type wifi con-name "${WLAN_SSID}" ifname wlan0 ssid "${WLAN_SSID}"
-	EO
-fi
+echo "test 4"
 
-if [ -v WLAN_SSID ] && [ -v WLAN_PASS ]; then
-	on_chroot <<- EOF
-  	SUDO_USER="${FIRST_USER_NAME}" nmcli c modify "${WLAN_SSID}" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "${WLAN_PASS}"
-	EOF
-fi
+# Create NetworkManager configuration files
+install -v -m 600 files/br0.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/br0.nmconnection"
+install -v -m 600 files/eth0.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/eth0.nmconnection"
+install -v -m 600 files/eth1.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/eth1.nmconnection"
 
-
-# set ethernet ports as bridged to allow switching behaviour
-on_chroot <<- EOF
-  	SUDO_USER="${FIRST_USER_NAME}" nmcli c add type bridge ifname "br0" con-name "br0"
-	SUDO_USER="${FIRST_USER_NAME}" nmcli c add type ethernet ifname "eth0" con-name "eth0" master "br0" slave-type bridge
-	SUDO_USER="${FIRST_USER_NAME}" nmcli c add type ethernet ifname "eth1" con-name "eth1" master "br0" slave-type bridge
+# Ensure the correct owner for the files
+on_chroot << EOF
+chown root:root /etc/NetworkManager/system-connections/br0.nmconnection
+chown root:root /etc/NetworkManager/system-connections/eth0.nmconnection
+chown root:root /etc/NetworkManager/system-connections/eth1.nmconnection
+chmod 600 /etc/NetworkManager/system-connections/br0.nmconnection
+chmod 600 /etc/NetworkManager/system-connections/eth0.nmconnection
+chmod 600 /etc/NetworkManager/system-connections/eth1.nmconnection
 EOF
 
 # GPIO
@@ -49,6 +46,6 @@ on_chroot <<- EOF
   ufw allow 22
   ufw allow 80
   ufw allow 443
-  uft allow 9090
+  ufw allow 9090
   ufw --force enable
 EOF

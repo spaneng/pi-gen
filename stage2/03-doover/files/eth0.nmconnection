@@ -1,0 +1,11 @@
+[connection]
+id=eth0
+uuid=43ae6dfd-f7ea-49cf-82c8-fb6fedc1fb3d
+type=ethernet
+interface-name=eth0
+master=br0
+slave-type=bridge
+
+[ethernet]
+
+[bridge-port]
