@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Build Doovit Image & Push to S3
-    runs-on: arm64-ubuntu-22.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
           DEPLOY_COMPRESSION: xz
         run: |
           export BASE_DIR=${GITHUB_WORKSPACE}
-          sudo ./build.sh -c ${GITHUB_WORKSPACE}/config.default
+          sudo ./build-docker.sh -c ${GITHUB_WORKSPACE}/config.default
 
       - name: Publish Image to S3
         env:
