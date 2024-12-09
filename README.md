@@ -1,3 +1,19 @@
+# Important
+
+Don't use the `master` branch. Use the `arm64` branch.
+
+Doovits run 64-bit architecture. The upstream `master` branch is for 32-bit.
+
+To build, simply 
+```bash
+sudo ./build-docker.sh -c config.default
+```
+
+To upload to S3, run the following. Make sure your AWS credentials are setup.
+```bash
+aws s3 cp deploy/*.img.xz s3://cmprovision-images/
+```
+
 # pi-gen
 
 Tool used to create Raspberry Pi OS images, and custom images based on Raspberry Pi OS,
