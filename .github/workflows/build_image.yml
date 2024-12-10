@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Build Doovit Image & Push to S3
-    runs-on: customarmrunner
+    runs-on: ubuntu-22.04-arm64-16c
 
     steps:
       - uses: actions/checkout@v4
