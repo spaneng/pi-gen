@@ -15,3 +15,5 @@ ENABLE_SSH=1
 
 WLAN_SSID=doover_magnet
 WLAN_PASS=doover_magnet
+
+DEPLOY_COMPRESSION: xz
