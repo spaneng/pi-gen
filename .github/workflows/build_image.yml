@@ -6,17 +6,10 @@ on:
 jobs:
   build:
     name: Build Doovit Image & Push to S3
-    runs-on: ubuntu-22.04-arm64-16c
-
+    runs-on: ubuntu-22.04-arm64-64c
+    if: github.ref == 'refs/heads/arm64'
     steps:
       - uses: actions/checkout@v4
-#      - name: Install dependencies
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install coreutils quilt parted qemu-user-static debootstrap zerofree zip \
-#            dosfstools libarchive-tools libcap2-bin grep rsync xz-utils file git curl bc \
-#            gpg pigz xxd arch-test
-
       - name: Build Image
         env:
           DEPLOY_COMPRESSION: xz
@@ -30,4 +23,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DOOVIT_IMAGE_AWS_SECRET_KEY }}
 
         run: |
-          aws s3 cp deploy/*.img.xz s3://cmprovision-images/
+          aws s3 cp ${GITHUB_WORKSPACE}/deploy/*.img.xz s3://cmprovision-images/
