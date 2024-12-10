@@ -10,12 +10,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install coreutils quilt parted qemu-user-static debootstrap zerofree zip \
-            dosfstools libarchive-tools libcap2-bin grep rsync xz-utils file git curl bc \
-            gpg pigz xxd arch-test
+#      - name: Install dependencies
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install coreutils quilt parted qemu-user-static debootstrap zerofree zip \
+#            dosfstools libarchive-tools libcap2-bin grep rsync xz-utils file git curl bc \
+#            gpg pigz xxd arch-test
 
       - name: Build Image
         env:
