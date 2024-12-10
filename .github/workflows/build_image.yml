@@ -1,1 +1,26 @@
 name: Release Package to APT Repository
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Doovit Image & Push to S3
+    runs-on: ubuntu-22.04-arm64-16c
+    if: github.ref == 'refs/heads/arm64'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Image
+        env:
+          DEPLOY_COMPRESSION: xz
+        run: |
+          export BASE_DIR=${GITHUB_WORKSPACE}
+          sudo ./build-docker.sh -c ${GITHUB_WORKSPACE}/config.default
+
+      - name: Publish Image to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DOOVIT_IMAGE_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DOOVIT_IMAGE_AWS_SECRET_KEY }}
+
+        run: |
+          aws s3 cp deploy/*.img.xz s3://cmprovision-images/
