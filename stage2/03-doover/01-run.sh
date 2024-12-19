@@ -74,11 +74,26 @@ dtoverlay=uart0,txd1_pin=14,rxd1_pin=15
 dtoverlay=uart1,txd1_pin=4,rxd1_pin=5
 gpio=9=op,dl
 gpio=11=op,dl
-gpio=13=op,dl
 gpio=20=op,dh
 gpio=21=op,dh
-dtoverlay=gpio-poweroff,gpiopin=6
+
+## Pin 6 is a run signal pin. Should stay high while the cm4 is running.
+## Then go low after shutdown
+gpio=6=op,dh
+#dtoverlay=gpio-shutdown,gpiopin=6,active_low=on,export=1
+dtoverlay=gpio-poweroff,gpiopin=6,active_low=on,timeout=60000,export=1
+
+## Pin 13 controls the power to the CM4. by default, stay high while cm4 running,
+# Then go low after shutdown. Ideally, this should be a gpio-poweroff overlay also
+# But can't have two of those.
+gpio=13=op,dl
+#dtoverlay=gpio-poweroff,gpiopin=13,active_low=on,timeout=60000,export=1
+
+## Enable I2C
 dtparam=i2c_arm=on
+
+## Disable the rainbow splash screen on boot
+disable_splash=1
 EOF
 
 on_chroot <<- EOF
@@ -89,3 +104,43 @@ on_chroot <<- EOF
   ufw allow 9090
   ufw --force enable
 EOF
+
+## Configure NGINX to proxy to cockpit
+install -v -m 644 files/nginx.default.config "${ROOTFS_DIR}/etc/nginx/sites-available/default"
+
+## Add the Nginx certificates
+on_chroot <<- EOF
+  sudo mkdir -p /etc/nginx/ssl
+  sudo openssl genrsa -out /etc/nginx/ssl/self-signed.key 2048
+  sudo openssl req -new -x509 -key /etc/nginx/ssl/self-signed.key -out /etc/nginx/ssl/self-signed.crt -subj "/C=AU/ST=QLD/L=Brisbane/O=Doover/OU=Doovit/CN=doover.com"
+EOF
+
+## Set the default keyboard layout to US
+install -v -m 644 files/keyboard "${ROOTFS_DIR}/etc/default/keyboard"
+
+## Customizing the MOTD message (Displayed when a user logs in on terminal or cockpit) 
+install -v -m 644 files/motd "${ROOTFS_DIR}/etc/motd"
+
+## Make a folder to store doover branding
+install -v -d -m 644 "${ROOTFS_DIR}/usr/share/doover"
+install -v -m 644 files/doover_logo.png "${ROOTFS_DIR}/usr/share/doover/doover_logo.png"
+install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/doover/doover_splash.png"
+
+## Change the splash screen
+install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/plymouth/themes/pix/splash.png"
+## Write this new splash screen to the initramfs
+on_chroot <<- EOF
+  update-initramfs -u
+EOF
+
+## Add the following to the /etc/os-release file if it doesn't exist
+on_chroot <<- EOF
+  if ! grep -q "DOOVIT_NAME" /etc/os-release; then
+    echo 'DOOVIT_NAME="Doovit (Bookworm)"' >> /etc/os-release
+  fi
+EOF
+
+## Update the cockpit branding
+install -v -m 644 files/cockpit_branding.css "${ROOTFS_DIR}/usr/share/cockpit/branding/debian/branding.css"
+install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/cockpit/branding/debian/doover_splash.png"
+install -v -m 644 files/doover_logo.png "${ROOTFS_DIR}/usr/share/cockpit/branding/debian/doover_logo.png"

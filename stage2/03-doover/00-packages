@@ -4,8 +4,11 @@ containerd.io
 docker-buildx-plugin
 docker-compose-plugin
 cockpit
+cockpit-navigator
+cockpit-task-scheduler
 micropython-mpremote
 doovit-cli
 doover-site-install
 ufw
 bridge-utils
+nginx

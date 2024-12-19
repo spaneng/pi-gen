@@ -10,6 +10,11 @@ chmod a+r "${ROOTFS_DIR}/etc/apt/keyrings/doover.asc"
 echo "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${RELEASE} stable" > "${ROOTFS_DIR}/etc/apt/sources.list.d/docker.list"
 echo "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/doover.asc] http://apt.u.doover.com stable main" > "${ROOTFS_DIR}/etc/apt/sources.list.d/doover.list"
 
+## Add the 45drives repo to the sources list
+on_chroot <<- EOF
+  curl -sSL https://repo.45drives.com/setup | bash
+EOF
+
 on_chroot <<- \EOF
   apt-get update
 EOF
