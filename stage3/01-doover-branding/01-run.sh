@@ -10,6 +10,7 @@ install -v -m 644 files/doover_logo.png "${ROOTFS_DIR}/usr/share/doover/doover_l
 install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/doover/doover_splash.png"
 
 ## Change the desktop wallpaper
+install -v -d -m 755 "${ROOTFS_DIR}/home/doovit/.config/pcmanfm/LXDE-pi"
 install -v -m 644 files/desktop-items-0.conf "${ROOTFS_DIR}/home/doovit/.config/pcmanfm/LXDE-pi/desktop-items-0.conf"
 
 ## Change the splash screen
