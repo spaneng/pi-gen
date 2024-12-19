@@ -5,7 +5,7 @@ docker-buildx-plugin
 docker-compose-plugin
 cockpit
 cockpit-navigator
-cockpit-task-scheduler
+cockpit-scheduler
 micropython-mpremote
 doovit-cli
 doover-site-install

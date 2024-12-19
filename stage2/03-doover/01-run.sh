@@ -105,6 +105,10 @@ on_chroot <<- EOF
   ufw --force enable
 EOF
 
+## Add the udev rule to mount the RP2040 when in bootloader mode
+install -v -m 644 files/99-rp2040.rules "${ROOTFS_DIR}/etc/udev/rules.d/99-rp2040.rules"
+install -v -m 755 files/mount_rp2040.sh "${ROOTFS_DIR}/usr/local/bin/mount_rp2040.sh"
+
 ## Configure NGINX to proxy to cockpit
 install -v -m 644 files/nginx.default.config "${ROOTFS_DIR}/etc/nginx/sites-available/default"
 
@@ -127,6 +131,10 @@ install -v -m 644 files/doover_logo.png "${ROOTFS_DIR}/usr/share/doover/doover_l
 install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/doover/doover_splash.png"
 
 ## Change the splash screen
+on_chroot <<- EOF
+  mkdir -p /usr/share/plymouth/themes/pix
+  #update-alternatives --install /usr/share/plymouth/themes/pix/splash.png pix-theme /usr/share/doover/doover_splash.png 100
+EOF
 install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/plymouth/themes/pix/splash.png"
 ## Write this new splash screen to the initramfs
 on_chroot <<- EOF
