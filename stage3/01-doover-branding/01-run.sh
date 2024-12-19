@@ -14,6 +14,7 @@ install -v -d -m 755 "${ROOTFS_DIR}/home/doovit/.config/pcmanfm/LXDE-pi"
 install -v -m 644 files/desktop-items-0.conf "${ROOTFS_DIR}/home/doovit/.config/pcmanfm/LXDE-pi/desktop-items-0.conf"
 
 ## Change the splash screen
+install -v -d -m 755 "${ROOTFS_DIR}/usr/share/plymouth/themes/pix"
 install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/plymouth/themes/pix/splash.png"
 ## Write this new splash screen to the initramfs
 on_chroot <<- EOF
