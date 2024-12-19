@@ -118,37 +118,3 @@ on_chroot <<- EOF
   sudo openssl genrsa -out /etc/nginx/ssl/self-signed.key 2048
   sudo openssl req -new -x509 -key /etc/nginx/ssl/self-signed.key -out /etc/nginx/ssl/self-signed.crt -subj "/C=AU/ST=QLD/L=Brisbane/O=Doover/OU=Doovit/CN=doover.com"
 EOF
-
-## Set the default keyboard layout to US
-install -v -m 644 files/keyboard "${ROOTFS_DIR}/etc/default/keyboard"
-
-## Customizing the MOTD message (Displayed when a user logs in on terminal or cockpit) 
-install -v -m 644 files/motd "${ROOTFS_DIR}/etc/motd"
-
-## Make a folder to store doover branding
-install -v -d -m 644 "${ROOTFS_DIR}/usr/share/doover"
-install -v -m 644 files/doover_logo.png "${ROOTFS_DIR}/usr/share/doover/doover_logo.png"
-install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/doover/doover_splash.png"
-
-## Change the splash screen
-on_chroot <<- EOF
-  mkdir -p /usr/share/plymouth/themes/pix
-  #update-alternatives --install /usr/share/plymouth/themes/pix/splash.png pix-theme /usr/share/doover/doover_splash.png 100
-EOF
-install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/plymouth/themes/pix/splash.png"
-## Write this new splash screen to the initramfs
-on_chroot <<- EOF
-  update-initramfs -u
-EOF
-
-## Add the following to the /etc/os-release file if it doesn't exist
-on_chroot <<- EOF
-  if ! grep -q "DOOVIT_NAME" /etc/os-release; then
-    echo 'DOOVIT_NAME="Doovit (Bookworm)"' >> /etc/os-release
-  fi
-EOF
-
-## Update the cockpit branding
-install -v -m 644 files/cockpit_branding.css "${ROOTFS_DIR}/usr/share/cockpit/branding/debian/branding.css"
-install -v -m 644 files/doover_splash.png "${ROOTFS_DIR}/usr/share/cockpit/branding/debian/doover_splash.png"
-install -v -m 644 files/doover_logo.png "${ROOTFS_DIR}/usr/share/cockpit/branding/debian/doover_logo.png"
